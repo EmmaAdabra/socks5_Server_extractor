@@ -27,6 +27,7 @@ def get_socks_images(image_dir):
 
 def extract_text_from_image(image_path):
   image = Image.open(image_path)
+
   return pytesseract.image_to_string(image)
 
 
@@ -47,6 +48,15 @@ def extract_ips_and_ports(text):
 
   return data
 
+def add_ip_port_to_list(socks_images):
+  try:
+    for image in socks_images:
+      image_text_content = extract_text_from_image(image)
+      ip_and_port = extract_ips_and_ports(image_text_content)
+      data.extend(ip_and_port)
+  except Exception as e:
+    print(f"An error occurred: {e}")
+
 
 def main():
   """controls program flow and logic"""
@@ -61,11 +71,8 @@ def main():
     sys.exit(1)
 
   socks_images = get_socks_images(socks_images_dir)
-  image_text_content = extract_text_from_image(socks_images[1])
-  sockets = extract_sockets(image_text_content)
-  ip_and_port = extract_ips_and_ports(image_text_content)
-  print(ip_and_port)
-
+  add_ip_port_to_list(socks_images)
+  print(data)
 
 if __name__ == "__main__":
   main()
