@@ -35,6 +35,26 @@ def extract_sockets(text):
     sockets = re.findall(socket_pattern, text)
     return sockets
 
+
+def extract_text(extracted_text):
+    # Use regex to find the relevant sections
+    country_region = re.search(r'COUNTRY(.*?)REGION', extracted_text, re.DOTALL)
+    region_city = re.search(r'REGION(.*?)CITY', extracted_text, re.DOTALL)
+    city_end = re.search(r'CITY(.*)', extracted_text, re.DOTALL)
+
+    # Extract the matched groups and clean them up
+    country_to_region = country_region.group(1).strip() if country_region else ''
+    region_to_city = region_city.group(1).strip() if region_city else ''
+    city_to_end = city_end.group(1).strip() if city_end else ''
+
+    # Return the results
+    return {
+        "country": [country.strip() for country in country_to_region.splitlines() if country.strip()],
+        "region": [region.strip() for region in region_to_city.splitlines() if region != ""],
+        "city": [city.strip() for city in city_to_end.splitlines() if city != ""],
+    }
+    
+
 def main():
   """controls program flow and logic"""
   # check if source directory exist
@@ -50,7 +70,11 @@ def main():
   socks_images = get_socks_images(socks_images_dir)
   image_text_content = extract_text_from_image(socks_images[0])
   sockets = extract_sockets(image_text_content)
+  cities = extract_text(image_text_content)
+  print(cities["country"])
   print(sockets)
+  print()
+  # print(image_text_content)
 
 
 if __name__ == "__main__":
