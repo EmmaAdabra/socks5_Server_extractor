@@ -19,12 +19,21 @@ def get_socks_images(image_dir):
         for img_name in os.listdir(socks_images_dir)
         if (img_name[0] != ".") and (img_name.endswith(".png") or img_name.endswith(".jpeg") or img_name.endswith(".jpg"))
   ]
-  
+
   return socks_images
+
 
 def extract_text_from_image(image_path):
   image = Image.open(image_path)
   return pytesseract.image_to_string(image)
+
+
+# Use regex to extract the IP addresses and ports
+def extract_sockets(text):
+    # Regex to match IP:Port (e.g., 162.19.7.47:27828)
+    socket_pattern = r'(\d{1,3}(?:\.\d{1,3}){3}:\d+)'
+    sockets = re.findall(socket_pattern, text)
+    return sockets
 
 def main():
   """controls program flow and logic"""
@@ -38,9 +47,10 @@ def main():
     print("Directory is empty")
     sys.exit(1)
 
-
   socks_images = get_socks_images(socks_images_dir)
-  extract_text_from_image(socks_images[0])
+  image_text_content = extract_text_from_image(socks_images[0])
+  sockets = extract_sockets(image_text_content)
+  print(sockets)
 
 
 if __name__ == "__main__":
