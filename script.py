@@ -58,6 +58,16 @@ def add_ip_port_to_list(socks_images):
     print(f"An error occurred: {e}")
 
 
+def save_to_csv(data):
+  if not os.path.exists(csv_dir):
+    os.makedirs(csv_dir)
+  save_path = os.path.join(csv_dir, 'socks_server.csv')
+  with open(save_path, mode='w', newline='') as file:
+    writer = csv.DictWriter(file, fieldnames=['ip', 'port'])
+    writer.writeheader()  # Write the header
+    writer.writerows(data)  # Write the data rows
+
+
 def main():
   """controls program flow and logic"""
   # check if source directory exist
@@ -72,7 +82,8 @@ def main():
 
   socks_images = get_socks_images(socks_images_dir)
   add_ip_port_to_list(socks_images)
-  print(data)
+  save_to_csv(data)
+  # print(data)
 
 if __name__ == "__main__":
   main()
