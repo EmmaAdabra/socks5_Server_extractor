@@ -1,3 +1,4 @@
+from hmac import new
 from PIL import Image
 import os
 import sys
@@ -12,6 +13,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 current_dir = os.path.dirname(os.path.abspath(__file__))
 socks_images_dir = os.path.join(current_dir, "socks_images")
 csv_dir = os.path.join(current_dir, "csv")
+data = []
 
 def get_socks_images(image_dir):
   socks_images = [
@@ -28,32 +30,23 @@ def extract_text_from_image(image_path):
   return pytesseract.image_to_string(image)
 
 
-# Use regex to extract the IP addresses and ports
-def extract_sockets(text):
-    # Regex to match IP:Port (e.g., 162.19.7.47:27828)
-    socket_pattern = r'(\d{1,3}(?:\.\d{1,3}){3}:\d+)'
-    sockets = re.findall(socket_pattern, text)
-    return sockets
+def extract_ips_and_ports(text):
+  # Updated regex pattern to capture IPs with optional spaces
+  pattern = r'(\d{1,3}(?:\.\s*\d{1,3}){3}):(\d+)'
+  matches = re.findall(pattern, text)
 
+  data = []
+  ip_and_port = {}
 
-def extract_text(extracted_text):
-    # Use regex to find the relevant sections
-    country_region = re.search(r'COUNTRY(.*?)REGION', extracted_text, re.DOTALL)
-    region_city = re.search(r'REGION(.*?)CITY', extracted_text, re.DOTALL)
-    city_end = re.search(r'CITY(.*)', extracted_text, re.DOTALL)
+  if matches:
+    for ip, port in matches:
+      ip_and_port["ip"] = ip.replace(" ", "")
+      ip_and_port["port"] = port
+      data.append(ip_and_port)
+      ip_and_port = {}
 
-    # Extract the matched groups and clean them up
-    country_to_region = country_region.group(1).strip() if country_region else ''
-    region_to_city = region_city.group(1).strip() if region_city else ''
-    city_to_end = city_end.group(1).strip() if city_end else ''
+  return data
 
-    # Return the results
-    return {
-        "country": [country.strip() for country in country_to_region.splitlines() if country.strip()],
-        "region": [region.strip() for region in region_to_city.splitlines() if region != ""],
-        "city": [city.strip() for city in city_to_end.splitlines() if city != ""],
-    }
-    
 
 def main():
   """controls program flow and logic"""
@@ -68,13 +61,10 @@ def main():
     sys.exit(1)
 
   socks_images = get_socks_images(socks_images_dir)
-  image_text_content = extract_text_from_image(socks_images[0])
+  image_text_content = extract_text_from_image(socks_images[1])
   sockets = extract_sockets(image_text_content)
-  cities = extract_text(image_text_content)
-  print(cities["country"])
-  print(sockets)
-  print()
-  # print(image_text_content)
+  ip_and_port = extract_ips_and_ports(image_text_content)
+  print(ip_and_port)
 
 
 if __name__ == "__main__":
