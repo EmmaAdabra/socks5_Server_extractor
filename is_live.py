@@ -64,8 +64,8 @@ def check_socks5_server_and_location(ip, port):
         
         # Get the server location
         country, region, city = get_server_location(ip)
-        add_to_live_server(ip, port, country, region, city)
         print(f"Server is located in {city}, {region}, {country}.")
+        add_to_live_server(ip, port, country, region, city)
     else:
         print(f"SOCKS5 server at {ip}:{port} is offline.")
 
