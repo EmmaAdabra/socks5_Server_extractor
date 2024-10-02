@@ -5,10 +5,10 @@ This project contains two scripts that work together to extract SOCKS5 server IP
 ## Project Structure
 
 ```bash
+├── csv/                # Folder where CSV files with extracted and live server data are stored.
+├── images/             # Folder to store images containing SOCKS5 server data.
 ├── extract_socket.py   # Extracts IPs and ports from images and saves them to a CSV file.
 ├── is_live.py          # Validates extracted SOCKS5 servers and checks their geographic location.
-├── images/             # Folder to store images containing SOCKS5 server data.
-├── csv/                # Folder where CSV files with extracted and live server data are stored.
 ```
 
 ## Scripts Overview
